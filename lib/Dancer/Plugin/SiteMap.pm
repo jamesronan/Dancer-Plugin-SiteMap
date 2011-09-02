@@ -15,7 +15,7 @@ Version 0.06
 
 =cut
 
-our $VERSION     = '0.06';
+our $VERSION     = '0.07';
 my  $OMIT_ROUTES = []; 
 
 # Add syntactic sugar for omitting routes.
@@ -82,8 +82,7 @@ sub _html_sitemap {
     }
     $content .= qq[ </ul>\n ];
 
-    engine('template')->apply_layout($content);
-    return $content;
+    return engine('template')->apply_layout($content);
 };
 
 
