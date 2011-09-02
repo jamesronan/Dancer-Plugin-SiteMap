@@ -75,25 +75,15 @@ certain routes via the sitemap_ignore keyword.
 # browser using the standard layout if one is defined.
 sub _html_sitemap {
     my @urls          = _retreive_get_urls();
-    my $content       = qq[ <h2> Site Map </h2>\n<ul class="sitemap">\n ];
-    my $dancer_config = Dancer->config();
 
+    my $content       = qq[ <h2> Site Map </h2>\n<ul class="sitemap">\n ];
     for my $url (@urls) {
         $content .= qq[ <li><a href="$url">$url</a></li>\n ];
     }
     $content .= qq[ </ul>\n ];
 
-    my $options ||= {layout => 1};
-    my $layout = $dancer_config->{layout};
-    undef $layout unless $options->{layout};
-
-    $layout .= '.tt' if $layout !~ /\.tt$/;
-    $layout = path($dancer_config->{views}, 'layouts', $layout);
-
-    my $full_content =
-        Dancer::Template->engine->render($layout, { content => $content });
-
-    return $full_content;
+    engine('template')->apply_layout($content);
+    return $content;
 };
 
 
