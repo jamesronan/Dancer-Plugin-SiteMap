@@ -11,12 +11,12 @@ Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
 
 =head1 VERSION
 
-Version 0.06
+Version 0.08
 
 =cut
 
-our $VERSION     = '0.07';
-my  $OMIT_ROUTES = []; 
+our $VERSION     = '0.08';
+my  $OMIT_ROUTES = [];
 
 # Add syntactic sugar for omitting routes.
 register 'sitemap_ignore' => sub {
@@ -42,7 +42,7 @@ get '/sitemap' => sub {
     use Dancer::Plugin::SiteMap;
 
 Yup, its that simple. Optionally you can omit routes:
-    
+
     sitemap_ignore ('ignore/this/route', 'orthese/.*');
 
 =head1 DESCRIPTION
@@ -58,10 +58,10 @@ have a site map.
 
 The HTML site map list can be styled throught the CSS class 'sitemap'
 
-Added additional functionality in 0.06 as follows: 
+Added additional functionality in 0.06 as follows:
 
-Firstly, fixed the route selector so the sitemap doesn't show the "or not" 
-operator ('?'), any route defined with a ':variable' in the path or a pure 
+Firstly, fixed the route selector so the sitemap doesn't show the "or not"
+operator ('?'), any route defined with a ':variable' in the path or a pure
 regexp as thats just dirty.
 
 More importantly, I came across the requirement to not have a few admin pages
@@ -94,7 +94,8 @@ sub _xml_sitemap {
 
     # add the "loc" key to each url so XML::Simple creates <loc></loc> tags.
     for my $url (@urls) {
-        push @sitemap_urls, { loc => [ $url ] };
+        my $uri = uri_for($url);
+        push @sitemap_urls, { loc => [ "$uri" ] }; # $uri has to be stringified
     }
 
     # create a hash for XML::Simple to turn into XML.
@@ -120,24 +121,24 @@ sub _retreive_get_urls {
 
     for my $app ( Dancer::App->applications ) {
         my $routes = $app->{registry}->{routes};
-        
+
         # push the static get routes into an array.
         get_route:
         for my $get_route ( @{ $routes->{get} } ) {
             if (ref($get_route->{pattern}) !~ m/HASH/i) {
-                
+
                 # If the pattern is a true comprehensive regexp or the route
                 # has a :variable element to it, then omit it.
                 next get_route if ($get_route->{pattern} =~ m/[()[\]|]|:\w/);
-              
-                # If there is a wildcard modifier, then drop it and have the 
+
+                # If there is a wildcard modifier, then drop it and have the
                 # full route.
                 $get_route->{pattern} =~ s/\?//g;
 
                 # Other than that, its cool to be added.
-                push (@urls, $get_route->{pattern}) 
-                    if ! grep { $get_route->{pattern} =~ m/$_/i } 
-                              @$Dancer::Plugin::SiteMap::OMIT_ROUTES; 
+                push (@urls, $get_route->{pattern})
+                    if ! grep { $get_route->{pattern} =~ m/$_/i }
+                              @$Dancer::Plugin::SiteMap::OMIT_ROUTES;
             }
         }
     }
