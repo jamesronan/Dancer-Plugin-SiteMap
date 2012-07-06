@@ -3,6 +3,7 @@ package Dancer::Plugin::SiteMap;
 use strict;
 use Dancer qw(:syntax);
 use Dancer::Plugin;
+
 use XML::Simple;
 
 =head1 NAME
@@ -11,11 +12,11 @@ Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =cut
 
-our $VERSION     = '0.08';
+our $VERSION     = '0.10';
 my  $OMIT_ROUTES = [];
 
 # Add syntactic sugar for omitting routes.
@@ -23,8 +24,8 @@ register 'sitemap_ignore' => sub {
     $Dancer::Plugin::SiteMap::OMIT_ROUTES = \@_;
 };
 
-# Add this plugin to Dancer
-register_plugin;
+# Add this plugin to Dancer, both Dancer 1 and Dancer 2 :-)
+register_plugin( for_versions => [ qw( 1 2 ) ] );
 
 
 # Add the routes for both the XML sitemap and the standalone one.
@@ -46,6 +47,8 @@ Yup, its that simple. Optionally you can omit routes:
     sitemap_ignore ('ignore/this/route', 'orthese/.*');
 
 =head1 DESCRIPTION
+
+B<This plugin now supports Dancer 1 and 2!>
 
 Plugin module for the Dancer web framwork that automagically adds sitemap
 routes to the webapp. Currently adds /sitemap and /sitemap.xml where the
@@ -117,35 +120,44 @@ sub _xml_sitemap {
 
 # Obtains the list of URLs from Dancers Route Registry.
 sub _retreive_get_urls {
-    my ($route, @urls);
 
-    for my $app ( Dancer::App->applications ) {
-        my $routes = $app->{registry}->{routes};
+    my $version = (exists &dancer_version) ? int( dancer_version() ) : 1;
+    my @apps    = ($version == 2) ? @{ runner->server->apps }
+                                  : Dancer::App->applications;
+
+    my ($route, @urls);
+    for my $app ( @apps ) {
+        my $routes = ($version == 2) ? $app->routes
+                                     : $app->{registry}->{routes};
 
         # push the static get routes into an array.
         get_route:
         for my $get_route ( @{ $routes->{get} } ) {
-            if (ref($get_route->{pattern}) !~ m/HASH/i) {
+            my $pattern = ($version == 2) ? $get_route->spec_route
+                                          : $get_route->{pattern};
+
+            if (ref($pattern) !~ m/HASH/i) {
 
                 # If the pattern is a true comprehensive regexp or the route
-                # has a :variable element to it, then omit it.
-                next get_route if ($get_route->{pattern} =~ m/[()[\]|]|:\w/);
+                # has a :variable element to it, then omit it. Dancer 2 also
+                # has /** entries - we'll dump them too.
+                next get_route if ($pattern =~ m/[()[\]|]|:\w/);
+                next get_route if ($pattern =~ m{/\*\*});
 
                 # If there is a wildcard modifier, then drop it and have the
                 # full route.
-                $get_route->{pattern} =~ s/\?//g;
+                $pattern =~ s/\?//g;
 
                 # Other than that, its cool to be added.
-                push (@urls, $get_route->{pattern})
-                    if ! grep { $get_route->{pattern} =~ m/$_/i }
+                push (@urls, $pattern)
+                    if ! grep { $pattern =~ m/$_/i }
                               @$Dancer::Plugin::SiteMap::OMIT_ROUTES;
             }
         }
     }
 
     return sort(@urls);
-};
-
+}
 
 =head1 AUTHOR
 

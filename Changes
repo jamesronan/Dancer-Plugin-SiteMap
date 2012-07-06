@@ -1,5 +1,13 @@
 Revision history for Dancer-Plugin-SiteMap
 
+0.10    06/07/2012 22:38:00
+        Added support for Dancer 2 - Official the first Dancer plugin
+        to seemlessly support both versions of the framework! :-)
+
+
+0.04-0.09 Wow, I was lazy and didn't update this... Bug fixes mostly :-)
+
+
 0.03    19/04/2010 19:50:00
         Ammended the change log, the README and added META.yml
 
