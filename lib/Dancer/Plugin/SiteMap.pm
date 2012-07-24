@@ -4,6 +4,7 @@ use strict;
 use Dancer qw(:syntax);
 use Dancer::Plugin;
 
+use Scalar::Util qw( blessed );
 use XML::Simple;
 
 =head1 NAME
@@ -12,15 +13,20 @@ Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION     = '0.10';
+our $VERSION     = '0.11';
 my  $OMIT_ROUTES = [];
 
 # Add syntactic sugar for omitting routes.
 register 'sitemap_ignore' => sub {
+
+    # Dancer 2 keywords receive a reference to the DSL object as a first param,
+    # So if we're running under D2, we need to make sure we don't pass that on
+    # to the route gathering code.
+    shift if Scalar::Util::blessed($_[0]) && $_[0]->isa('Dancer::Core::DSL');
     $Dancer::Plugin::SiteMap::OMIT_ROUTES = \@_;
 };
 
