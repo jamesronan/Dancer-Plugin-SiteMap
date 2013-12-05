@@ -17,7 +17,7 @@ Version 0.11
 
 =cut
 
-our $VERSION     = '0.11';
+our $VERSION     = '0.12';
 my  $OMIT_ROUTES = [];
 
 # Add syntactic sugar for omitting routes.
@@ -153,6 +153,9 @@ sub _retreive_get_urls {
                 # If there is a wildcard modifier, then drop it and have the
                 # full route.
                 $pattern =~ s/\?//g;
+
+                # Only add any given route once.
+                next get_route if grep { $_ eq $pattern } @urls;
 
                 # Other than that, its cool to be added.
                 push (@urls, $pattern)
