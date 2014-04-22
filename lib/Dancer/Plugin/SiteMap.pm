@@ -7,12 +7,6 @@ use Dancer::Plugin;
 use Scalar::Util;
 use XML::Simple;
 
-=head1 NAME
-
-Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
-
-=cut
-
 our $VERSION     = '0.13';
 my  $OMIT_ROUTES = [];
 
@@ -64,59 +58,6 @@ if ( defined $conf->{'robots_disallow'} ) {
     close $inFH;
     sitemap_ignore(@disallowed_list);
 }
-
-=head1 SYNOPSIS
-
-    use Dancer;
-    use Dancer::Plugin::SiteMap;
-
-Yup, its that simple. Optionally you can omit routes:
-
-    sitemap_ignore ('ignore/this/route', 'orthese/.*');
-
-Or omit all routes disallowed in robots.txt.
-In the config.yml of the application:
-
-    plugins:
-        SiteMap:
-            robots_disallow: /local/path/to/robots.txt
-
-You can also change the default route for the sitemap by adding fields to
-the plugin config.
-
-eg, in the config.yml of the application:
-
-    plugins:
-        SiteMap:
-            xml_route: /sitemap_static.xml
-            html_route:                           # html sitemap is disabled.
-
-=head1 DESCRIPTION
-
-B<This plugin now supports Dancer 1 and 2!>
-
-Plugin module for the Dancer web framwork that automagically adds sitemap
-routes to the webapp. Currently adds /sitemap and /sitemap.xml where the
-former is a basic HTML list and the latter is an XML document of URLS.
-
-Currently it only adds staticly defined routes for the GET method.
-
-Using the module is literally that simple... 'use' it and your app will
-have a site map.
-
-The HTML site map list can be styled throught the CSS class 'sitemap'
-
-Added additional functionality in 0.06 as follows:
-
-Firstly, fixed the route selector so the sitemap doesn't show the "or not"
-operator ('?'), any route defined with a ':variable' in the path or a pure
-regexp as thats just dirty.
-
-More importantly, I came across the requirement to not have a few admin pages
-listed in the sitemap, so I've added the ability to tell the plugin to ignore
-certain routes via the sitemap_ignore keyword.
-
-=cut
 
 # The action handler for the automagic /sitemap route. Uses the list of
 # URLs from _retreive_get_urls and outputs a basic HTML template to the
@@ -207,6 +148,66 @@ sub _retreive_get_urls {
     return sort(@urls);
 }
 
+
+1; # End of Dancer::Plugin::SiteMap
+__END__
+
+=head1 NAME
+
+Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
+
+=head1 SYNOPSIS
+
+    use Dancer;
+    use Dancer::Plugin::SiteMap;
+
+Yup, its that simple. Optionally you can omit routes:
+
+    sitemap_ignore ('ignore/this/route', 'orthese/.*');
+
+Or omit all routes disallowed in robots.txt.
+In the config.yml of the application:
+
+    plugins:
+        SiteMap:
+            robots_disallow: /local/path/to/robots.txt
+
+You can also change the default route for the sitemap by adding fields to
+the plugin config.
+
+eg, in the config.yml of the application:
+
+    plugins:
+        SiteMap:
+            xml_route: '/sitemap_static.xml'
+            html_route:                           # html sitemap is disabled.
+
+=head1 DESCRIPTION
+
+B<This plugin now supports Dancer 1 and 2!>
+
+Plugin module for the Dancer web framwork that automagically adds sitemap
+routes to the webapp. Currently adds /sitemap and /sitemap.xml where the
+former is a basic HTML list and the latter is an XML document of URLS.
+
+Currently it only adds staticly defined routes for the GET method.
+
+Using the module is literally that simple... 'use' it and your app will
+have a site map.
+
+The HTML site map list can be styled throught the CSS class 'sitemap'
+
+Added additional functionality in 0.06 as follows:
+
+Firstly, fixed the route selector so the sitemap doesn't show the "or not"
+operator ('?'), any route defined with a ':variable' in the path or a pure
+regexp as thats just dirty.
+
+More importantly, I came across the requirement to not have a few admin pages
+listed in the sitemap, so I've added the ability to tell the plugin to ignore
+certain routes via the sitemap_ignore keyword.
+
+
 =head1 AUTHOR
 
 James Ronan, C<< <james at ronanweb.co.uk> >>
@@ -251,7 +252,7 @@ L<http://search.cpan.org/dist/Dancer-Plugin-SiteMap/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2010 James Ronan.
+Copyright 2010-2014 James Ronan.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
@@ -259,7 +260,3 @@ by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
 
-
-=cut
-
-1; # End of Dancer::Plugin::SiteMap
