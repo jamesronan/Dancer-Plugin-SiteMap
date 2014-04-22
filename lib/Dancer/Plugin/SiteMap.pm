@@ -17,7 +17,7 @@ Version 0.12
 
 =cut
 
-our $VERSION     = '0.12';
+our $VERSION     = '0.13';
 my  $OMIT_ROUTES = [];
 
 # Add syntactic sugar for omitting routes.
@@ -35,13 +35,48 @@ register_plugin( for_versions => [ qw( 1 2 ) ] );
 
 
 # Add the routes for both the XML sitemap and the standalone one.
-get '/sitemap.xml' => sub {
-    _xml_sitemap();
-};
+# The path to the route can be defined in the plugin configuration
+my $conf = plugin_setting();
 
-get '/sitemap' => sub {
-    _html_sitemap();
-};
+if ( defined $conf->{'xml_route'} ) {
+    # Non default route for XML sitemap
+    get $conf->{'xml_route'} => sub { _xml_sitemap() };
+}
+elsif ( exists $conf->{'xml_route'} ) {
+    # XML sitemap is disabled. Do not add a route.
+}
+else {
+    # Default route for XML sitemap
+    get '/sitemap.xml' => sub { _xml_sitemap() };
+}
+
+if ( defined $conf->{'html_route'} ) {
+    # Non default route for HTML sitemap
+    get $conf->{'html_route'} => sub { _html_sitemap() };
+}
+elsif ( exists $conf->{'html_route'} ) {
+    # HTML sitemap is disabled. Do not add a route.
+}
+else {
+    # Default route for HTML sitemap
+    get '/sitemap' => sub { _html_sitemap() };
+}
+
+if ( defined $conf->{'robots_disallow'} ) {
+    # Read the Disallow lines from robots.txt and add to $OMIT_ROUTES
+    my $robots_txt = $conf->{'robots_disallow'};
+    my @disallowed_list = ();
+    open my $inFH, '<', $robots_txt or die "Error reading $robots_txt $!";
+
+    while ( my $line = <$inFH> ) {
+        if ( $line =~ m/Disallow: \s*(\/.*)$/ ) {
+            push @disallowed_list, $1;
+        }
+    }
+
+    close $inFH;
+    sitemap_ignore(@disallowed_list);
+}
 
 =head1 SYNOPSIS
 
@@ -51,6 +86,23 @@ get '/sitemap' => sub {
 Yup, its that simple. Optionally you can omit routes:
 
     sitemap_ignore ('ignore/this/route', 'orthese/.*');
+
+Or omit all routes disallowed in robots.txt.
+In the config.yml of the application:
+
+    plugins:
+        SiteMap:
+            robots_disallow: /local/path/to/robots.txt
+
+You can also change the default route for the sitemap by adding fields to
+the plugin config.
+
+eg, in the config.yml of the application:
+
+    plugins:
+        SiteMap:
+            xml_route: /sitemap_static.xml
+            html_route:                           # html sitemap is disabled.
 
 =head1 DESCRIPTION
 
