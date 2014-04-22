@@ -4,7 +4,7 @@ use strict;
 use Dancer qw(:syntax);
 use Dancer::Plugin;
 
-use Scalar::Util qw( blessed );
+use Scalar::Util;
 use XML::Simple;
 
 =head1 NAME
