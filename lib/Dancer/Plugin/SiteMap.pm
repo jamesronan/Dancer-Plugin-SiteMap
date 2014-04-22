@@ -33,34 +33,28 @@ register 'sitemap_ignore' => sub {
 # Add this plugin to Dancer, both Dancer 1 and Dancer 2 :-)
 register_plugin( for_versions => [ qw( 1 2 ) ] );
 
+my $conf       = plugin_setting();
+my $xml_route  = '/sitemap.xml';
+my $html_route = '/sitemap';
 
-# Add the routes for both the XML sitemap and the standalone one.
-# The path to the route can be defined in the plugin configuration
-my $conf = plugin_setting();
-
-if ( defined $conf->{'xml_route'} ) {
-    # Non default route for XML sitemap
-    get $conf->{'xml_route'} => sub { _xml_sitemap() };
-}
-elsif ( exists $conf->{'xml_route'} ) {
-    # XML sitemap is disabled. Do not add a route.
-}
-else {
-    # Default route for XML sitemap
-    get '/sitemap.xml' => sub { _xml_sitemap() };
+# if route exists but it's not defined, means the developer doesn't
+# want to define it. If route doesn't exist on the plugin settings
+# at all, we go with the default /sitemap.xml route.
+if (exists $conf->{'xml_route'}) {
+    $xml_route = $conf->{'xml_route'} || undef;
 }
 
-if ( defined $conf->{'html_route'} ) {
-    # Non default route for HTML sitemap
-    get $conf->{'html_route'} => sub { _html_sitemap() };
+get $xml_route => \&_xml_sitemap
+    if $xml_route;
+
+# same thing for the html route.
+if (exists $conf->{'html_route'}) {
+    $html_route = $conf->{'html_route'} || undef;
 }
-elsif ( exists $conf->{'html_route'} ) {
-    # HTML sitemap is disabled. Do not add a route.
-}
-else {
-    # Default route for HTML sitemap
-    get '/sitemap' => sub { _html_sitemap() };
-}
+
+get $html_route => \&_html_sitemap
+    if $html_route;
+
 
 if ( defined $conf->{'robots_disallow'} ) {
     # Read the Disallow lines from robots.txt and add to $OMIT_ROUTES
