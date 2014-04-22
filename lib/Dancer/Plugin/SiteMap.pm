@@ -9,6 +9,7 @@ use XML::Simple;
 
 our $VERSION     = '0.13';
 my  $OMIT_ROUTES = [];
+my  @sitemap_urls;
 
 # Add syntactic sugar for omitting routes.
 register 'sitemap_ignore' => sub {
@@ -106,6 +107,7 @@ sub _xml_sitemap {
 
 # Obtains the list of URLs from Dancers Route Registry.
 sub _retreive_get_urls {
+    return @sitemap_urls if @sitemap_urls;
 
     my $version = (exists &dancer_version) ? int( dancer_version() ) : 1;
     my @apps    = ($version == 2) ? @{ runner->server->apps }
@@ -145,7 +147,7 @@ sub _retreive_get_urls {
         }
     }
 
-    return sort(@urls);
+    return @sitemap_urls = sort(@urls);
 }
 
 
