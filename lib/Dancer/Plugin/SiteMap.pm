@@ -11,10 +11,6 @@ use XML::Simple;
 
 Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
 
-=head1 VERSION
-
-Version 0.12
-
 =cut
 
 our $VERSION     = '0.13';
