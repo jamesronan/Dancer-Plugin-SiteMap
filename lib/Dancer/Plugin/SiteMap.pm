@@ -17,7 +17,7 @@ register 'sitemap_ignore' => sub {
     # So if we're running under D2, we need to make sure we don't pass that on
     # to the route gathering code.
     shift if Scalar::Util::blessed($_[0]) && $_[0]->isa('Dancer::Core::DSL');
-    $Dancer::Plugin::SiteMap::OMIT_ROUTES = \@_;
+    push @$Dancer::Plugin::SiteMap::OMIT_ROUTES, @_;
 };
 
 # Add this plugin to Dancer, both Dancer 1 and Dancer 2 :-)
@@ -161,9 +161,14 @@ Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
     use Dancer;
     use Dancer::Plugin::SiteMap;
 
-Yup, its that simple. Optionally you can omit routes:
+Yup, its that simple. Optionally you can omit routes by passing a list of
+regex patterns to be filtered out.:
 
-    sitemap_ignore ('ignore/this/route', 'orthese/.*');
+    sitemap_ignore( 'ignore/this/route', 'orthese/.*' );
+
+    # you can make several calls to sitemap_ignore, the new patterns
+    # will be added without removing the old ones.
+    sitemap_ignore( '/other/route' );
 
 Or omit all routes disallowed in robots.txt.
 In the config.yml of the application:
