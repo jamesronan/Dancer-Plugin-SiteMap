@@ -139,7 +139,7 @@ sub _retreive_get_urls {
 
                 # Other than that, its cool to be added.
                 push (@urls, $pattern)
-                    if ! grep { $pattern =~ m/$_/i }
+                    if ! grep { $pattern =~ m/^$_/i }
                               @$Dancer::Plugin::SiteMap::OMIT_ROUTES;
             }
         }
