@@ -65,11 +65,11 @@ if ( defined $conf->{'robots_disallow'} ) {
 sub _html_sitemap {
     my @urls          = _retreive_get_urls();
 
-    my $content       = qq[ <h2> Site Map </h2>\n<ul class="sitemap">\n ];
+    my $content       = qq[<h2>Site Map</h2>\n<ul class="sitemap">\n];
     for my $url (@urls) {
-        $content .= qq[ <li><a href="$url">$url</a></li>\n ];
+        $content .= qq[  <li><a href="$url">$url</a></li>\n];
     }
-    $content .= qq[ </ul>\n ];
+    $content .= qq[</ul>\n];
 
     return engine('template')->apply_layout($content);
 };
