@@ -31,10 +31,11 @@ my $html_route = '/sitemap';
 # if route exists but it's not defined, means the developer doesn't
 # want to define it. If route doesn't exist on the plugin settings
 # at all, we go with the default /sitemap.xml route.
-foreach my $varname (qw(xml_route html_route)) {
-    if (exists $conf->{$varname}) {
-        ${$varname} = $conf->{$varname} || undef;
-    }
+if (exists $conf->{'xml_route'}) {
+    $xml_route = $conf->{'xml_route'} || undef;
+}
+if (exists $conf->{'html_route'}) {
+    $html_route = $conf->{'html_route'} || undef;
 }
 
 get $xml_route => \&_xml_sitemap
