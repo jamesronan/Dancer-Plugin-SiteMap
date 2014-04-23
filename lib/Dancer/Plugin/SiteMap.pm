@@ -224,6 +224,14 @@ certain routes via the sitemap_ignore keyword.
 
 James Ronan, C<< <james at ronanweb.co.uk> >>
 
+=head1 CONTRIBUTORS
+
+Many thanks to the following guys for adding features (and tests!) to this
+plugin:
+
+Breno G. de Oliveira, B<GARU> C<< <garu at cpan.org> >>
+
+David Pottage, B<SPUDSOUP> C<< <spudsoup at cpan.org> >>
 
 =head1 BUGS
 
