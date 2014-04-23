@@ -30,8 +30,8 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-SiteMap
+    Github's Issue Tracker
+        https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues
 
     AnnoCPAN, Annotated CPAN documentation
         http://annocpan.org/dist/Dancer-Plugin-SiteMap
@@ -39,13 +39,13 @@ You can also look for information at:
     CPAN Ratings
         http://cpanratings.perl.org/d/Dancer-Plugin-SiteMap
 
-    Search CPAN
-        http://search.cpan.org/dist/Dancer-Plugin-SiteMap/
+    MetaCPAN
+        http://metacpan.org/pod/Dancer::Plugin::SiteMap
 
 
 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 James Ronan
+Copyright (C) 2010-2014 James Ronan
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
