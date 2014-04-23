@@ -11,3 +11,5 @@ cover_db
 pod2htm*.tmp
 Dancer-Plugin-SiteMap-*
 *.swp
+MYMETA*
+.prove
