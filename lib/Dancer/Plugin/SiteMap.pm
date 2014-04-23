@@ -52,7 +52,7 @@ if ( defined $conf->{'robots_disallow'} ) {
     open my $inFH, '<', $robots_txt or die "Error reading $robots_txt $!";
 
     while ( my $line = <$inFH> ) {
-        if ( $line =~ m/Disallow: \s*(\/.*)$/ ) {
+        if ( $line =~ m/^\s*Disallow: \s*(\/[^\s#]*)/ ) {
             push @disallowed_list, $1;
         }
     }
