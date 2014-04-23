@@ -185,7 +185,9 @@ In the config.yml of the application:
             robots_disallow: /local/path/to/robots.txt
 
 Finally, you can change the default route for the sitemap by adding fields to
-the plugin config.
+the plugin config. It's worth noting that this must be a full route path,
+ie. start with a slash. Having a route option in the config but with no value
+will disable that particular sitemap.
 
 eg, in the config.yml of the application:
 
