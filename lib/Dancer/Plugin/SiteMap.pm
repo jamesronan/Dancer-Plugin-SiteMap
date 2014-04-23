@@ -165,7 +165,7 @@ Dancer::Plugin::SiteMap - Automated site map for the Dancer web framework.
     use Dancer::Plugin::SiteMap;
 
 Yup, its that simple. Optionally you can omit routes by passing a list of
-regex patterns to be filtered out.:
+B<regex patterns> to be filtered out.:
 
     sitemap_ignore( 'ignore/this/route', 'orthese/.*' );
 
@@ -173,14 +173,18 @@ regex patterns to be filtered out.:
     # will be added without removing the old ones.
     sitemap_ignore( '/other/route' );
 
-Or omit all routes disallowed in robots.txt.
+Note that your specified routes will be tied to the beginning of the route,
+so if you say C<sitemap_ignore('/path')> then the sitemap will exclude routes
+like '/path', but not '/some/other/path'.
+
+You may also tell this plugin to omit all routes disallowed in robots.txt.
 In the config.yml of the application:
 
     plugins:
         SiteMap:
             robots_disallow: /local/path/to/robots.txt
 
-You can also change the default route for the sitemap by adding fields to
+Finally, you can change the default route for the sitemap by adding fields to
 the plugin config.
 
 eg, in the config.yml of the application:
