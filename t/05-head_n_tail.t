@@ -3,8 +3,20 @@ use warnings;
 use Test::More import => ['!pass'];
 plan tests => 9 + 4;
 
+# this file was forked from t/01-usage.t
+
+my $head = '<div class="container"><div class="row"><div class="column">' . "\n";
+my $tail = '</div></div></div>' . "\n";
+
 {
     use Dancer;
+
+    setting(plugins => {
+        SiteMap => {
+            html_head => $head,
+            html_tail => $tail,
+        },
+    });
 
     eval 'use Dancer::Plugin::SiteMap';
     die $@ if $@;
@@ -46,12 +58,12 @@ plan tests => 9 + 4;
 
 use Dancer::Test;
 
-test_xml_and_html ();
+test_xml_and_html ($head,$tail);
 
 sub test_xml_and_html {
     my $head = shift || '';
     my $tail = shift || '';
-    
+
     route_exists [ GET => '/sitemap'     ], '/sitemap route generated';
     route_exists [ GET => '/sitemap.xml' ], '/sitemap.xml route generated';
 

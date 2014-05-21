@@ -7,7 +7,7 @@ use Dancer::Plugin;
 use Scalar::Util;
 use XML::Simple;
 
-our $VERSION     = '0.13';
+our $VERSION     = '0.13_01';
 my  $OMIT_ROUTES = [];
 my  @sitemap_urls;
 
@@ -67,11 +67,14 @@ if ( defined $conf->{'robots_disallow'} ) {
 sub _html_sitemap {
     my @urls          = _retreive_get_urls();
 
-    my $content       = qq[<h2>Site Map</h2>\n<ul class="sitemap">\n];
+    my $head          = $conf->{'html_head'} || '';
+    my $tail          = $conf->{'html_tail'} || '';
+
+    my $content       = $head . qq[<h2>Site Map</h2>\n<ul class="sitemap">\n];
     for my $url (@urls) {
         $content .= qq[  <li><a href="$url">$url</a></li>\n];
     }
-    $content .= qq[</ul>\n];
+    $content .= qq[</ul>\n] . $tail;
 
     return engine('template')->apply_layout($content);
 };
@@ -196,6 +199,30 @@ eg, in the config.yml of the application:
             xml_route: '/sitemap_static.xml'
             html_route:                           # html sitemap is disabled.
 
+Generated HTML may be prefixed by html_head content and postfixed by html_tail
+content from F<config.yml>:
+
+    plugins:
+        SiteMap:
+            html_head: '<div class="container"><div class="row"><div class="column">'
+            html_tail: '</div></div></div>'
+
+This will generate:
+
+    ${html_head}<h2>Site Map</h2>
+    <ul class="sitemap">
+      <li><a href="/foo">/foo</a></li>
+      ...
+    </ul>${html_tail}
+
+instead of plain:
+
+    <h2>Site Map</h2>
+    <ul class="sitemap">
+      <li><a href="/foo">/foo</a></li>
+      ...
+    </ul>
+
 =head1 DESCRIPTION
 
 B<This plugin now supports Dancer 1 and 2!>
@@ -282,4 +309,3 @@ under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-
