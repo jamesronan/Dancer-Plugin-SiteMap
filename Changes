@@ -1,5 +1,8 @@
 Revision history for Dancer-Plugin-SiteMap
 
+0.12_01 ??/??/???? ??:??:??
+        Added html_head and html_tail config keys.
+
 0.12    05/12/2013 14:41:00
         Bugfix for RT #91176.
         The SiteMap was duplicating entries when the AJAX plugin was in use
@@ -24,4 +27,3 @@ Revision history for Dancer-Plugin-SiteMap
 
 0.01    18/04/2010 19:30:00
         First version, released on an unsuspecting world.
-
