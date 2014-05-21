@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More import => ['!pass'];
-plan tests => 13;
+plan tests => 9 + 4;
 
 {
     use Dancer;
@@ -46,14 +46,20 @@ plan tests => 13;
 
 use Dancer::Test;
 
-route_exists [ GET => '/sitemap'     ], '/sitemap route generated';
-route_exists [ GET => '/sitemap.xml' ], '/sitemap.xml route generated';
+test_xml_and_html ();
 
-# we run these tests twice to make sure we can call our routes
-# several times and get the same result
-foreach (1 .. 2) {
-    my $res = dancer_response( GET => '/sitemap.xml' );
-    my $expected_xml = <<'EOXML';
+sub test_xml_and_html {
+    my $head = shift || '';
+    my $tail = shift || '';
+    
+    route_exists [ GET => '/sitemap'     ], '/sitemap route generated';
+    route_exists [ GET => '/sitemap.xml' ], '/sitemap.xml route generated';
+
+    # we run these tests twice to make sure we can call our routes
+    # several times and get the same result
+    foreach (1 .. 2) {
+        my $res = dancer_response( GET => '/sitemap.xml' );
+        my $expected_xml = <<'EOXML';
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -83,12 +89,12 @@ foreach (1 .. 2) {
 </urlset>
 EOXML
 
-    is $res->status, 200, "got /sitemap.xml (turn: $_)";
-    is $res->content, $expected_xml, "got the proper sitemap.xml content (turn: $_)";
+        is $res->status, 200, "got /sitemap.xml (turn: $_)";
+        is $res->content, $expected_xml, "got the proper sitemap.xml content (turn: $_)";
 
-    $res = dancer_response( GET => '/sitemap' );
-    my $expected_html = <<'EOHTML';
-<h2>Site Map</h2>
+        $res = dancer_response( GET => '/sitemap' );
+        my $expected_html = <<"EOHTML" . $tail;
+$head<h2>Site Map</h2>
 <ul class="sitemap">
   <li><a href="/bar">/bar</a></li>
   <li><a href="/meep">/meep</a></li>
@@ -101,7 +107,7 @@ EOXML
 </ul>
 EOHTML
 
-    is $res->status, 200, "got /sitemap (turn: $_)";
-    is $res->content, $expected_html, "got the proper sitemap content (turn: $_)";
+        is $res->status, 200, "got /sitemap (turn: $_)";
+        is $res->content, $expected_html, "got the proper sitemap content (turn: $_)";
+    }
 }
-
