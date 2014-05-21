@@ -18,4 +18,15 @@ WriteMakefile(
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Dancer-Plugin-SiteMap-*' },
+    ($ExtUtils::MakeMaker::VERSION >= 6.46
+     ? (
+         META_MERGE => {
+             resources => {
+                 license     => [ 'http://dev.perl.org/licenses/' ],
+                 bugtracker  => 'https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues',
+                 repository  => 'https://github.com/jamesronan/Dancer-Plugin-SiteMap',
+             }
+         },
+       ) : ()
+    ),
 );
