@@ -1,6 +1,6 @@
 Revision history for Dancer-Plugin-SiteMap
 
-0.14    22/05/2014 11:00:00
+0.14    22/05/2014 15:00:00
         Added feature inspired by patch by XAV.
         - Add configurable optional HTML template for the HTML sitemap.
         - Have the manifest test ignore .git directories.

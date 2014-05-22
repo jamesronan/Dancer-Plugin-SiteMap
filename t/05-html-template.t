@@ -3,28 +3,28 @@ use warnings;
 use Test::More import => ['!pass'];
 plan tests => 4;
 
-# Set up the details of a wrapper template to use.
-my $wrapper_filename = 'test-sitemap-wrapper.template';
-my $wrapper_content = <<WRAPPER;
-<div id="wrapper-test">
+# Set up the details of a temporary template to use.
+my $template_filename = 'test-sitemap-template.template';
+my $template_content = <<WRAPPER;
+<div id="template-test">
 <% sitemap %>
 </div>
 WRAPPER
 
-my $wrapper_location = '.';
-open my $wrapper_fh, '>', $wrapper_location . "/" . $wrapper_filename;
-if ($wrapper_fh) {
-    print {$wrapper_fh} $wrapper_content;
-    close $wrapper_fh;
+my $template_location = '.';
+open my $template_fh, '>', $template_location . "/" . $template_filename;
+if ($template_fh) {
+    print {$template_fh} $template_content;
+    close $template_fh;
 }
 
 {
     use Dancer;
 
-    setting(views => $wrapper_location);
+    setting(views => $template_location);
     setting(plugins => {
         SiteMap => {
-            html_wrapper => $wrapper_filename,
+            html_template => $template_filename,
         },
     });
 
@@ -39,14 +39,14 @@ use Dancer::Test;
 
 SKIP: {
     skip "Couldn't create template file to test with", 2
-        unless -f $wrapper_location . "/" . $wrapper_filename;
+        unless -f $template_location . "/" . $template_filename;
 
     # we run these tests twice to make sure we can call our routes
     # several times and get the same result
     foreach (1 .. 2) {
         my $res = dancer_response( GET => '/sitemap' );
         my $expected_html = <<'EOHTML';
-<div id="wrapper-test">
+<div id="template-test">
 <h2>Site Map</h2>
 <ul class="sitemap">
   <li><a href="/bar">/bar</a></li>
@@ -63,7 +63,7 @@ EOHTML
     }
 }
 
-# Bin off the temporary wrapper template.
-unlink $wrapper_location . "/" . $wrapper_filename
-    if -f $wrapper_location . "/" . $wrapper_filename;
+# Bin off the temporary template.
+unlink $template_location . "/" . $template_filename
+    if -f $template_location . "/" . $template_filename;
 

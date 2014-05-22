@@ -85,8 +85,8 @@ sub _html_sitemap {
     # If the config specifies a HTML Wrapper for the HTML SiteMap - then use
     # that (which handily also stuffs it in the layout). Failing that, we need
     # to just take the sitemap and whack it in the site layout
-    return ($conf->{html_wrapper})
-        ? template $conf->{html_wrapper}, { sitemap => $content }
+    return ($conf->{html_template})
+        ? template $conf->{html_template}, { sitemap => $content }
         : engine('template')->apply_layout($content);
 };
 
@@ -199,13 +199,14 @@ In the config.yml of the application:
             robots_disallow: /local/path/to/robots.txt
 
 Should you require more HTML around the sitemap, for styling / structure
-purposes, you can define the config option html_wrapper.  If this key is present
-the sitemap will try to render within the view named. That view should be
-created in views/ and contain at least a <% sitemap %> token.
+purposes, you can define the config option html_template.  If this key is
+present the sitemap will try to render within the template view named. That view
+should be created in the location of your app's views setting as with any other
+template and contain at least a <% sitemap %> token.
 
     plugins:
         SiteMap:
-            html_wrapper: 'mysite_wrapper.t'
+            html_template: 'mysitemap_template.t'
 
     ---
     <div class="extra_thing">
@@ -264,15 +265,18 @@ Breno G. de Oliveira, B<GARU> C<< <garu at cpan.org> >>
 
 David Pottage, B<SPUDSOUP> C<< <spudsoup at cpan.org> >>
 
-Xavier Caron, B<XAV> C<< <xav at cpan.org >>
+Xavier Caron, B<XAV> C<< <xav at cpan.org> >>
 
 =head1 BUGS
 
 Please report any bugs or feature requests to the web interface at
 L<https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues>.
-I will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
+Alternatively, you can also use the CPAN RT request tracker at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-SiteMap>
 
+Pull Requests are welcome for bug fixes and features alike. The plugin is under
+version control on GitHub at:
+L<https://github.com/jamesronan/Dancer-Plugin-SiteMap>
 
 =head1 SUPPORT
 
@@ -288,6 +292,10 @@ You can also look for information at:
 =item * Github's Issue Tracker
 
 L<https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-SiteMap>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
