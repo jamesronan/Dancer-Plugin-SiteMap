@@ -198,6 +198,21 @@ In the config.yml of the application:
         SiteMap:
             robots_disallow: /local/path/to/robots.txt
 
+Should you require more HTML around the sitemap, for styling / structure
+purposes, you can define the config option html_wrapper.  If this key is present
+the sitemap will try to render within the view named. That view should be
+created in views/ and contain at least a <% sitemap %> token.
+
+    plugins:
+        SiteMap:
+            html_wrapper: 'mysite_wrapper.t'
+
+    ---
+    <div class="extra_thing">
+    <% sitemap %>
+    </div>
+    ---
+
 Finally, you can change the default route for the sitemap by adding fields to
 the plugin config. It's worth noting that this must be a full route path,
 ie. start with a slash. Having a route option in the config but with no value
@@ -248,6 +263,8 @@ plugin:
 Breno G. de Oliveira, B<GARU> C<< <garu at cpan.org> >>
 
 David Pottage, B<SPUDSOUP> C<< <spudsoup at cpan.org> >>
+
+Xavier Caron, B<XAV> C<< <xav at cpan.org >>
 
 =head1 BUGS
 
