@@ -7,7 +7,7 @@ use Dancer::Plugin;
 use Scalar::Util;
 use XML::Simple;
 
-our $VERSION     = '0.13';
+our $VERSION     = '0.14';
 my  $OMIT_ROUTES = [];
 my  @sitemap_urls;
 
@@ -24,40 +24,49 @@ register 'sitemap_ignore' => sub {
 # Add this plugin to Dancer, both Dancer 1 and Dancer 2 :-)
 register_plugin( for_versions => [ qw( 1 2 ) ] );
 
-my $conf       = plugin_setting();
-my $xml_route  = '/sitemap.xml';
-my $html_route = '/sitemap';
+my $conf   = plugin_setting();
+my %routes = (
+    html => {
+        urlpath => '/sitemap',
+        coderef => \&_html_sitemap,
+    },
+    xml  => {
+        urlpath => '/sitemap.xml',
+        coderef => \&_xml_sitemap,
+    },
+);
 
-# if route exists but it's not defined, means the developer doesn't
-# want to define it. If route doesn't exist on the plugin settings
-# at all, we go with the default /sitemap.xml route.
-if (exists $conf->{'xml_route'}) {
-    $xml_route = $conf->{'xml_route'} || undef;
+# If a route exists but it's not defined within the app settings, this means the
+# developer wishes the app omit that particular sitemap type. If the route
+# doesn't exist in the plugin settings at all, we go with the default urlpath
+# for that route.
+for my $route_type (keys %routes) {
+    my $route      = $routes{$route_type};
+    my $config_key = $route_type . "_route";
+
+    if (exists $conf->{$config_key}) {
+        $route->{urlpath} = $conf->{$config_key} || undef;
+    }
+
+    get $route->{urlpath} => $route->{coderef} if $route->{urlpath};
 }
-if (exists $conf->{'html_route'}) {
-    $html_route = $conf->{'html_route'} || undef;
-}
 
-get $xml_route => \&_xml_sitemap
-    if $xml_route;
-
-get $html_route => \&_html_sitemap
-    if $html_route;
-
-
+# Add omissions defined in the robots.txt file, if that option is specified in
+# the config.
 if ( defined $conf->{'robots_disallow'} ) {
+
     # Read the Disallow lines from robots.txt and add to $OMIT_ROUTES
     my $robots_txt = $conf->{'robots_disallow'};
     my @disallowed_list = ();
-    open my $inFH, '<', $robots_txt or die "Error reading $robots_txt $!";
+    open my $robots_fh, '<', $robots_txt or die "Error reading $robots_txt $!";
 
-    while ( my $line = <$inFH> ) {
-        if ( $line =~ m/^\s*Disallow: \s*(\/[^\s#]*)/ ) {
+    while (my $line = <$robots_fh>) {
+        if ($line =~ m/^\s*Disallow: \s*(\/[^\s#]*)/) {
             push @disallowed_list, $1;
         }
     }
 
-    close $inFH;
+    close $robots_fh;
     sitemap_ignore(@disallowed_list);
 }
 
@@ -65,15 +74,20 @@ if ( defined $conf->{'robots_disallow'} ) {
 # URLs from _retreive_get_urls and outputs a basic HTML template to the
 # browser using the standard layout if one is defined.
 sub _html_sitemap {
-    my @urls          = _retreive_get_urls();
+    my @urls = _retreive_get_urls();
 
-    my $content       = qq[<h2>Site Map</h2>\n<ul class="sitemap">\n];
+    my $content = qq[<h2>Site Map</h2>\n<ul class="sitemap">\n];
     for my $url (@urls) {
         $content .= qq[  <li><a href="$url">$url</a></li>\n];
     }
     $content .= qq[</ul>\n];
 
-    return engine('template')->apply_layout($content);
+    # If the config specifies a HTML Wrapper for the HTML SiteMap - then use
+    # that (which handily also stuffs it in the layout). Failing that, we need
+    # to just take the sitemap and whack it in the site layout
+    return ($conf->{html_template})
+        ? template $conf->{html_template}, { sitemap => $content }
+        : engine('template')->apply_layout($content);
 };
 
 
@@ -184,6 +198,22 @@ In the config.yml of the application:
         SiteMap:
             robots_disallow: /local/path/to/robots.txt
 
+Should you require more HTML around the sitemap, for styling / structure
+purposes, you can define the config option html_template.  If this key is
+present the sitemap will try to render within the template view named. That view
+should be created in the location of your app's views setting as with any other
+template and contain at least a <% sitemap %> token.
+
+    plugins:
+        SiteMap:
+            html_template: 'mysitemap_template.t'
+
+    ---
+    <div class="extra_thing">
+    <% sitemap %>
+    </div>
+    ---
+
 Finally, you can change the default route for the sitemap by adding fields to
 the plugin config. It's worth noting that this must be a full route path,
 ie. start with a slash. Having a route option in the config but with no value
@@ -235,13 +265,18 @@ Breno G. de Oliveira, B<GARU> C<< <garu at cpan.org> >>
 
 David Pottage, B<SPUDSOUP> C<< <spudsoup at cpan.org> >>
 
+Xavier Caron, B<XAV> C<< <xav at cpan.org> >>
+
 =head1 BUGS
 
 Please report any bugs or feature requests to the web interface at
 L<https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues>.
-I will be notified, and then you'll automatically be notified of
-progress on your bug as I make changes.
+Alternatively, you can also use the CPAN RT request tracker at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-SiteMap>
 
+Pull Requests are welcome for bug fixes and features alike. The plugin is under
+version control on GitHub at:
+L<https://github.com/jamesronan/Dancer-Plugin-SiteMap>
 
 =head1 SUPPORT
 
@@ -257,6 +292,10 @@ You can also look for information at:
 =item * Github's Issue Tracker
 
 L<https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-SiteMap>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
